@@ -9,6 +9,7 @@ import android.content.Context;
 public class TodoApp extends Application {
     private TodoComponent mainComponent;
 
+    
     @Override
     public void onCreate() {
         super.onCreate();
