@@ -30,32 +30,43 @@ import rx.functions.Func1;
 
 @AutoValue
 abstract class ListsItem implements Parcelable {
-  private static String ALIAS_LIST = "list";
-  private static String ALIAS_ITEM = "item";
+    private static String ALIAS_LIST = "list";
+    private static String ALIAS_ITEM = "item";
 
-  private static String LIST_ID = ALIAS_LIST + "." + TodoList.ID;
-  private static String LIST_NAME = ALIAS_LIST + "." + TodoList.NAME;
-  private static String ITEM_COUNT = "item_count";
-  private static String ITEM_ID = ALIAS_ITEM + "." + TodoItem.ID;
-  private static String ITEM_LIST_ID = ALIAS_ITEM + "." + TodoItem.LIST_ID;
+    private static String LIST_ID = ALIAS_LIST + "." + TodoList.ID;
+    private static String LIST_NAME = ALIAS_LIST + "." + TodoList.NAME;
+    private static String ITEM_COUNT = "item_count";
+    private static String ITEM_ID = ALIAS_ITEM + "." + TodoItem.ID;
+    private static String ITEM_LIST_ID = ALIAS_ITEM + "." + TodoItem.LIST_ID;
 
-  public static Collection<String> TABLES = Arrays.asList(TodoList.TABLE, TodoItem.TABLE);
-  public static String QUERY = ""
-      + "SELECT " + LIST_ID + ", " + LIST_NAME + ", COUNT(" + ITEM_ID + ") as " + ITEM_COUNT
-      + " FROM " + TodoList.TABLE + " AS " + ALIAS_LIST
-      + " LEFT OUTER JOIN " + TodoItem.TABLE + " AS " + ALIAS_ITEM + " ON " + LIST_ID + " = " + ITEM_LIST_ID
-      + " GROUP BY " + LIST_ID;
+    // declare two table
+    public static Collection<String> TABLES = Arrays.asList(TodoList.TABLE, TodoItem.TABLE);
 
-  abstract long id();
-  abstract String name();
-  abstract int itemCount();
+    /**
+     * query two table
+     */
+    public static String QUERY = ""
+            + "SELECT " + LIST_ID + ", " + LIST_NAME + ", COUNT(" + ITEM_ID + ") as " + ITEM_COUNT
+            + " FROM " + TodoList.TABLE + " AS " + ALIAS_LIST
+            + " LEFT OUTER JOIN " + TodoItem.TABLE + " AS " + ALIAS_ITEM + " ON " + LIST_ID + " = " + ITEM_LIST_ID
+            + " GROUP BY " + LIST_ID;
 
-  static Func1<Cursor, ListsItem> MAPPER = new Func1<Cursor, ListsItem>() {
-    @Override public ListsItem call(Cursor cursor) {
-      long id = Db.getLong(cursor, TodoList.ID);
-      String name = Db.getString(cursor, TodoList.NAME);
-      int itemCount = Db.getInt(cursor, ITEM_COUNT);
-      return new AutoValue_ListsItem(id, name, itemCount);
-    }
-  };
+    abstract long id();
+
+    abstract String name();
+
+    abstract int itemCount();
+
+    /**
+     * method to transform a row in cursor to an object
+     */
+    static Func1<Cursor, ListsItem> MAPPER = new Func1<Cursor, ListsItem>() {
+        @Override
+        public ListsItem call(Cursor cursor) {
+            long id = Db.getLong(cursor, TodoList.ID);
+            String name = Db.getString(cursor, TodoList.NAME);
+            int itemCount = Db.getInt(cursor, ITEM_COUNT);
+            return new AutoValue_ListsItem(id, name, itemCount);
+        }
+    };
 }

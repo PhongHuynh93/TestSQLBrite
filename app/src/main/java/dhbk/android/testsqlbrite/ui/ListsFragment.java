@@ -41,6 +41,10 @@ public class ListsFragment extends Fragment {
 
     private Listener listener;
     private ListsAdapter adapter;
+
+    /**
+     * declare field subcription, so you can unsubcribe it later
+     */
     private Subscription subscription;
 
     public ListsFragment() {
@@ -101,18 +105,30 @@ public class ListsFragment extends Fragment {
         listener.onListClicked(listId);
     }
 
+    /**
+     * subscribe
+     */
     @Override
     public void onResume() {
         super.onResume();
 
         getActivity().setTitle("To-Do");
 
+        /**
+         * query the table
+         * mapToList: translate  each row in cursor to a list of object
+         * note that when use this method -  if the db is very large, it's make this method is very comsume time because translate to each object.
+         *
+         *  remember to turn on the UI thread
+         */
         subscription = db.createQuery(ListsItem.TABLES, ListsItem.QUERY)
                 .mapToList(ListsItem.MAPPER)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(adapter);
+        // subscribe to an action
     }
 
+    // unsubcribe
     @Override
     public void onPause() {
         super.onPause();
