@@ -29,6 +29,7 @@ import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_IF_ROOM;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT;
 
 public class ListsFragment extends Fragment {
+    // inject the brite db
     @Inject
     BriteDatabase db;
 
@@ -57,6 +58,8 @@ public class ListsFragment extends Fragment {
         }
 
         super.onAttach(activity);
+
+        // how to inject the dagger to this class
         TodoApp.getComponent(activity).inject(this);
         setHasOptionsMenu(true);
 

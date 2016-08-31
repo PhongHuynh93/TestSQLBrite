@@ -28,7 +28,7 @@ import dhbk.android.testsqlbrite.ui.NewListFragment;
 @Component(modules = TodoModule.class)
 public interface TodoComponent {
 
-    // inject to class
+    // inject to ListsFragment class
     void inject(ListsFragment fragment);
 
     void inject(ItemsFragment fragment);
