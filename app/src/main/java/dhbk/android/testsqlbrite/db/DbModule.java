@@ -28,29 +28,42 @@ import dagger.Provides;
 import rx.schedulers.Schedulers;
 
 /**
- *
+ * declare sqlbrite module
  */
 @Module
 public final class DbModule {
+
+    /**
+     * provide singleton database by calling the constructor of the database
+     * @param application
+     * @return
+     */
     @Provides
     @Singleton
     SQLiteOpenHelper provideOpenHelper(Application application) {
         return new DbOpenHelper(application);
     }
 
+    /**
+     * create the sqlbrite
+     * @return
+     */
     @Provides
     @Singleton
     SqlBrite provideSqlBrite() {
-        return SqlBrite.create(new SqlBrite.Logger() {
-            @Override
-            public void log(String message) {
-            }
-        });
+        return SqlBrite.create();
     }
 
+    /**
+     * wrapped the db inside the sqlbrite
+     * @param sqlBrite the sqlbrite which we have create, the db that needs to be wrapped
+     * @param helper the db that needs to be wrapped
+     * @return the sqlbrite wrap db = db have rxjava
+     */
     @Provides
     @Singleton
     BriteDatabase provideDatabase(SqlBrite sqlBrite, SQLiteOpenHelper helper) {
+        // declare different threads, so query can run whichout block the UI threads.
         BriteDatabase db = sqlBrite.wrapDatabaseHelper(helper, Schedulers.io());
         db.setLoggingEnabled(true);
         return db;
