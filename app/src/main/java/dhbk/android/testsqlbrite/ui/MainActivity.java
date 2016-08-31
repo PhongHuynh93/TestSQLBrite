@@ -1,7 +1,9 @@
-package dhbk.android.testsqlbrite;
+package dhbk.android.testsqlbrite.ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import dhbk.android.testsqlbrite.R;
 
 public class MainActivity extends AppCompatActivity {
 
