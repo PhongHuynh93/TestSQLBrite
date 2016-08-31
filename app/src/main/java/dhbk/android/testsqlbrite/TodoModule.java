@@ -23,8 +23,7 @@ import dagger.Module;
 import dagger.Provides;
 import dhbk.android.testsqlbrite.db.DbModule;
 
-@Module(includes = {DbModule.class,}
-)
+@Module(includes = {DbModule.class,})
 public final class TodoModule {
     private final Application application;
 
@@ -32,6 +31,7 @@ public final class TodoModule {
         this.application = application;
     }
 
+    // provide application context
     @Provides
     @Singleton
     Application provideApplication() {

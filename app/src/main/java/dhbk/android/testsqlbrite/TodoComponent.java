@@ -23,15 +23,17 @@ import dhbk.android.testsqlbrite.ui.ListsFragment;
 import dhbk.android.testsqlbrite.ui.NewItemFragment;
 import dhbk.android.testsqlbrite.ui.NewListFragment;
 
+// because this is a application, its declare singleton
 @Singleton
 @Component(modules = TodoModule.class)
 public interface TodoComponent {
 
-  void inject(ListsFragment fragment);
+    // inject to class
+    void inject(ListsFragment fragment);
 
-  void inject(ItemsFragment fragment);
+    void inject(ItemsFragment fragment);
 
-  void inject(NewItemFragment fragment);
+    void inject(NewItemFragment fragment);
 
-  void inject(NewListFragment fragment);
+    void inject(NewListFragment fragment);
 }
