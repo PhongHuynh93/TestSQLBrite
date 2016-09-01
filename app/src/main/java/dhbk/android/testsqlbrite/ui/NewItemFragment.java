@@ -46,6 +46,9 @@ public final class NewItemFragment extends DialogFragment {
         return fragment;
     }
 
+    /**
+     * todo PublishSubject is a observable and observer
+     */
     private final PublishSubject<String> createClicked = PublishSubject.create();
 
     @Inject
@@ -68,10 +71,18 @@ public final class NewItemFragment extends DialogFragment {
         View view = LayoutInflater.from(context).inflate(R.layout.new_item, null);
 
         EditText name = findById(view, android.R.id.input);
+
+        /**
+         * todo combineLatest:
+         *
+         * createClicked: has string "clicked", we dont want this string
+         * RxTextView.textChanges(name): has string user has entered "..." -> this is new
+         */
         Observable.combineLatest(createClicked, RxTextView.textChanges(name),
                 new Func2<String, CharSequence, String>() {
                     @Override
                     public String call(String ignored, CharSequence text) {
+                        // so ignore the string default
                         return text.toString();
                     }
                 }) //
@@ -79,6 +90,7 @@ public final class NewItemFragment extends DialogFragment {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String description) {
+                        // insert the new string into the db
                         db.insert(TodoItem.TABLE,
                                 new TodoItem.Builder().listId(getListId()).description(description).build());
                     }
@@ -90,6 +102,7 @@ public final class NewItemFragment extends DialogFragment {
                 .setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        // emit the default string
                         createClicked.onNext("clicked");
                     }
                 })
