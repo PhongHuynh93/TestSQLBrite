@@ -37,7 +37,6 @@ import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_IF_ROOM;
 import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT;
 
@@ -46,6 +45,8 @@ import static android.support.v4.view.MenuItemCompat.SHOW_AS_ACTION_WITH_TEXT;
  */
 public class ItemsFragment extends Fragment {
     private static final String KEY_LIST_ID = "list_id";
+
+    // todo - the select with condition with where
     private static final String LIST_QUERY = "SELECT * FROM "
             + TodoItem.TABLE
             + " WHERE "
@@ -53,6 +54,8 @@ public class ItemsFragment extends Fragment {
             + " = ? ORDER BY "
             + TodoItem.COMPLETE
             + " ASC";
+
+    // todo - the select with condition with where
     private static final String COUNT_QUERY = "SELECT COUNT(*) FROM "
             + TodoItem.TABLE
             + " WHERE "
@@ -62,6 +65,7 @@ public class ItemsFragment extends Fragment {
             + " AND "
             + TodoItem.LIST_ID
             + " = ?";
+
     private static final String TITLE_QUERY =
             "SELECT " + TodoList.NAME + " FROM " + TodoList.TABLE + " WHERE " + TodoList.ID + " = ?";
 
@@ -139,15 +143,20 @@ public class ItemsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+
+        // todo set list view to custome adapter
         listView.setEmptyView(emptyView);
         listView.setAdapter(adapter);
 
+
+        // todo listen the click event on this adapter, when click , update the database
         RxAdapterView.itemClickEvents(listView) //
                 .observeOn(Schedulers.io())
                 .subscribe(new Action1<AdapterViewItemClickEvent>() {
                     @Override
                     public void call(AdapterViewItemClickEvent event) {
                         boolean newValue = !adapter.getItem(event.position()).complete();
+                        // todo update the db
                         db.update(TodoItem.TABLE, new TodoItem.Builder().complete(newValue).build(),
                                 TodoItem.ID + " = ?", String.valueOf(event.id()));
                     }
@@ -159,13 +168,16 @@ public class ItemsFragment extends Fragment {
         super.onResume();
         String listId = String.valueOf(getListId());
 
+        // TODO: 9/1/16  create the composite subcription to unsubcribe all of at once
         subscriptions = new CompositeSubscription();
 
+        // TODO: 9/1/16 get the int item from cursor
         Observable<Integer> itemCount = db.createQuery(TodoItem.TABLE, COUNT_QUERY, listId) //
                 .map(new Func1<SqlBrite.Query, Integer>() {
                     @Override
                     public Integer call(SqlBrite.Query query) {
                         Cursor cursor = query.run();
+                        // fixme - what is moveToNext in db
                         try {
                             if (!cursor.moveToNext()) {
                                 throw new AssertionError("No rows");
@@ -176,6 +188,8 @@ public class ItemsFragment extends Fragment {
                         }
                     }
                 });
+
+
         Observable<String> listName =
                 db.createQuery(TodoList.TABLE, TITLE_QUERY, listId).map(new Func1<SqlBrite.Query, String>() {
                     @Override
@@ -191,6 +205,13 @@ public class ItemsFragment extends Fragment {
                         }
                     }
                 });
+
+
+        /**
+         * todo combineLatest use this if you want to use the lastest data to set the tittle
+         * use this in 2 stream, so whenever there is a new data arrive set it to the title in toolbar
+         * @see <a href="https://github.com/ReactiveX/RxJava/wiki/Combining-Observables">combineLatest</a>
+         */
         subscriptions.add(
                 Observable.combineLatest(listName, itemCount, new Func2<String, Integer, String>() {
                     @Override
@@ -206,12 +227,14 @@ public class ItemsFragment extends Fragment {
                             }
                         }));
 
+        // TODO: 9/1/16 query the table item, and notify the adapter for change
         subscriptions.add(db.createQuery(TodoItem.TABLE, LIST_QUERY, listId)
                 .mapToList(TodoItem.MAPPER)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(adapter));
     }
 
+    // todo rememeber to unsubscribe it
     @Override
     public void onPause() {
         super.onPause();
